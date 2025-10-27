@@ -23,6 +23,7 @@ export type LoginResponse = {
 export type Usuario = {
     id: number;
     nome: string;
+    sobrenome: string;
     email: string;
 };
 
@@ -39,7 +40,7 @@ export type CreateUsuario = {
 async function safeJsonParse(response: Response) {
     try {
         if (!response) return {};
-        if (response.status === 204) return {}; // No Content
+        if (response.status === 204) return {};
         const text = await response.text();
         if (!text) return {};
         return JSON.parse(text);
@@ -48,8 +49,6 @@ async function safeJsonParse(response: Response) {
         return {};
     }
 }
-
-
 
 // Serviço de autenticação
 const authService = {
@@ -63,15 +62,12 @@ const authService = {
                 },
                 body: JSON.stringify({ email, senha }),
             });
-
-            const json = await safeJsonParse(response);
-            return json;
+            return await safeJsonParse(response);
         } catch (err) {
             console.log("Erro signIn:", err);
             return { status: false, mensagem: "Erro de conexão" };
         }
     },
-
 
     checkToken: async (token: string) => {
         try {
@@ -83,14 +79,12 @@ const authService = {
                 },
                 body: JSON.stringify({ token }),
             });
-            const json = await safeJsonParse(response);
-            return json;
+            return await safeJsonParse(response);
         } catch (err) {
             console.log("Erro checkToken:", err);
             return { status: false, mensagem: "Erro de conexão" };
         }
     },
-
 
     handleCadastro: async (usuario: string, nome: string, sobrenome: string, email: string, senha: string, confirmaSenha: string) => {
         try {
@@ -119,39 +113,38 @@ const authService = {
             const token = await AsyncStorage.getItem('@user_token');
             if (!token) throw new Error('Token não encontrado no AsyncStorage');
 
-            const response = await axios.get<Usuario[]>(`${API_URL}/Usuario`, {
+            const response = await axios.get(`${API_URL}/Usuario`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
             });
 
-            return response.data;
+            return response.data.data; //  array de usuários
         } catch (err: any) {
-            if (axios.isAxiosError(err)) {
-                if (!err.response) console.error('Erro de rede GET:', err.message);
-                else console.error('Erro na API GET:', err.response.data);
-            } else {
-                console.error('Erro desconhecido GET:', err);
-            }
+            console.error('Erro ao buscar usuários:', err);
             throw err;
         }
     },
 
-    // getUsuarios: async (): Promise<Usuario[]> => {
-    //     try {
-    //         const response = await axios.get<Usuario[]>(`${API_URL}/Usuario`);
-    //         return response.data;
-    //     } catch (err: any) {
-    //         if (axios.isAxiosError(err)) {
-    //             if (!err.response) console.error("Erro de rede GET:", err.message);
-    //             else console.error("Erro na API GET:", err.response.data);
-    //         } else {
-    //             console.error("Erro desconhecido GET:", err);
-    //         }
-    //         throw err;
-    //     }
-    // },
+    getUsuarioById: async (id: number): Promise<Usuario> => {
+        try {
+            const token = await AsyncStorage.getItem('@user_token');
+            if (!token) throw new Error('Token não encontrado no AsyncStorage');
+
+            const response = await axios.get(`${API_URL}/Usuario/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            return response.data.data; // usuário individual
+        } catch (err: any) {
+            console.error(`Erro ao buscar usuário ${id}:`, err);
+            throw err;
+        }
+    },
 };
 
 export default authService;
