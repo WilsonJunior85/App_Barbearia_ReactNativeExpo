@@ -1,4 +1,5 @@
 import axios, { isAxiosError } from "axios";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // URL base da API
 const API_URL = "http://192.168.1.78:5295/api";
@@ -115,18 +116,42 @@ const authService = {
 
     getUsuarios: async (): Promise<Usuario[]> => {
         try {
-            const response = await axios.get<Usuario[]>(`${API_URL}/Usuario`);
+            const token = await AsyncStorage.getItem('@user_token');
+            if (!token) throw new Error('Token não encontrado no AsyncStorage');
+
+            const response = await axios.get<Usuario[]>(`${API_URL}/Usuario`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
             return response.data;
         } catch (err: any) {
             if (axios.isAxiosError(err)) {
-                if (!err.response) console.error("Erro de rede GET:", err.message);
-                else console.error("Erro na API GET:", err.response.data);
+                if (!err.response) console.error('Erro de rede GET:', err.message);
+                else console.error('Erro na API GET:', err.response.data);
             } else {
-                console.error("Erro desconhecido GET:", err);
+                console.error('Erro desconhecido GET:', err);
             }
             throw err;
         }
     },
+
+    // getUsuarios: async (): Promise<Usuario[]> => {
+    //     try {
+    //         const response = await axios.get<Usuario[]>(`${API_URL}/Usuario`);
+    //         return response.data;
+    //     } catch (err: any) {
+    //         if (axios.isAxiosError(err)) {
+    //             if (!err.response) console.error("Erro de rede GET:", err.message);
+    //             else console.error("Erro na API GET:", err.response.data);
+    //         } else {
+    //             console.error("Erro desconhecido GET:", err);
+    //         }
+    //         throw err;
+    //     }
+    // },
 };
 
 export default authService;

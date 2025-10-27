@@ -13,4 +13,5 @@ export const styles = StyleSheet.create({
     nota: { marginLeft: 5, fontWeight: 'bold', color: '#555' },
     botao: { backgroundColor: '#74C2D4', paddingVertical: 6, paddingHorizontal: 15, borderRadius: 20, alignSelf: 'flex-start', marginLeft: 150, marginTop: -35 },
     textoBotao: { color: '#fff', fontWeight: 'bold' },
+
 });

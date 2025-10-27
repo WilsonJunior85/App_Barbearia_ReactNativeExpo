@@ -1,19 +1,16 @@
 import * as Location from 'expo-location';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import React, { useEffect, useState, useContext } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import authService, { Usuario as UsuarioAPI } from '../../../src/services/authService';
-
 import {
   View,
   Text,
   FlatList,
-  StyleSheet,
   TouchableOpacity,
-  Image,
   TextInput,
   ListRenderItem,
   Dimensions,
+  ScrollView,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
@@ -166,14 +163,25 @@ export default function Home() {
       if (userData) setUsuarioLogado(JSON.parse(userData));
 
       // Lista de usuários da API
+      // Lista de usuários da API
       try {
-        const usuariosAPI: UsuarioAPI[] = await authService.getUsuarios();
-        // Map para pegar apenas nome e sobrenome
+        const resposta = await authService.getUsuarios();
+        console.log('Resposta getUsuarios:', resposta);
+
+        // Verifica se é um array, senão tenta pegar os dados corretos
+        const usuariosAPI = Array.isArray(resposta) ? resposta : resposta?.data || []; // <- caso venha dentro de { data: [...] }
+
+        if (!Array.isArray(usuariosAPI)) {
+          console.warn('getUsuarios não retornou um array:', usuariosAPI);
+          return;
+        }
+
         const usuariosCard: UsuarioCard[] = usuariosAPI.map((u) => ({
           id: u.id,
           nome: u.nome,
-          sobrenome: (u as any).sobrenome || '',
+          sobrenome: u.sobrenome || '',
         }));
+
         setUsuarios(usuariosCard);
       } catch (err) {
         console.error('Erro ao carregar usuários:', err);
@@ -191,32 +199,8 @@ export default function Home() {
     { id: '2', nome: 'Henrique Gandini', avaliacao: 4.7 },
     { id: '3', nome: 'Wilson Júnior', avaliacao: 4.7 },
     { id: '4', nome: 'Renan Castilho', avaliacao: 4.7 },
+    { id: '5', nome: 'Thiago Manhães', avaliacao: 4.7 },
   ];
-
-  //CARREGAR ITEMS
-  // const renderItem: ListRenderItem<Barbeiro> = ({ item }) => (
-  //   <View style={styles.card}>
-  //     <View style={styles.avatar}></View>
-  //     <View style={styles.info}>
-  //       <Text style={styles.nome}>{item.nome}</Text>
-  //       <View style={styles.avaliacao}>
-  //         {Array.from({ length: 5 }).map((_, i) => (
-  //           <TouchableOpacity key={i} onPress={() => setNotaSelecionada(i + 1)}>
-  //             <Ionicons
-  //               name={i < notaSelecionada ? 'star' : 'star-outline'}
-  //               size={16}
-  //               color="#FFD700"
-  //             />
-  //           </TouchableOpacity>
-  //         ))}
-  //         <Text style={styles.nota}>{item.avaliacao}</Text>
-  //       </View>
-  //       <TouchableOpacity style={styles.botao} onPress={pagePerfil}>
-  //         <Text style={styles.textoBotao}>Ver Perfil</Text>
-  //       </TouchableOpacity>
-  //     </View>
-  //   </View>
-  // );
 
   const emoji = '✂️';
 
@@ -260,16 +244,14 @@ export default function Home() {
       )}
 
       <FlatList
-        data={barbeiros} // array com todos os usuários
+        data={barbeiros}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View style={styles.avatar}></View>
             <View style={styles.info}>
-              <Text style={styles.nome}>
-                {/* {item.nome} {item.nome} */}
-                {item.nome}
-              </Text>
+              <Text style={styles.nome}>{item.nome}</Text>
+
               <View style={styles.avaliacao}>
                 {Array.from({ length: 5 }).map((_, i) => (
                   <TouchableOpacity key={i} onPress={() => setNotaSelecionada(i + 1)}>
@@ -282,12 +264,20 @@ export default function Home() {
                 ))}
                 <Text style={styles.nota}>{item.avaliacao}</Text>
               </View>
+
               <TouchableOpacity style={styles.botao} onPress={pagePerfil}>
                 <Text style={styles.textoBotao}>Ver Perfil</Text>
               </TouchableOpacity>
             </View>
           </View>
         )}
+        style={{
+          flexGrow: 0, // impede que ocupe toda a tela
+          maxHeight: height * 0.35, // define uma altura máxima visível (35% da tela)
+        }}
+        contentContainerStyle={{
+          paddingBottom: 16,
+        }}
       />
 
       <BottomMenu />
