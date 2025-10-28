@@ -8,20 +8,27 @@ import { UserContext } from '../../../app/contexts/UserContext';
 import { Avaliacao } from '../Avaliacao/avaliacao';
 
 export default function Barbeiro() {
+  // CAPTURA DE PARÂMETROS DA ROTA
   const params = useLocalSearchParams();
   const barbeiroId = params.id ? Number(params.id) : null;
 
+  // CONTEXTO DO USUÁRIO LOGADO
   const { state: usuarioLogado } = useContext(UserContext); // pega o usuário logado
+
+  // ESTADOS LOCAIS
   const [barbeiro, setBarbeiro] = useState<Usuario | null>(null);
   const [notaSelecionada, setNotaSelecionada] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // Avaliações mockadas, já que a API não retorna ainda
+  // AVALIAÇÕES MOCKADAS (simulação)
   const avaliacoesMockadas = [
     { id: '1', comentario: 'Muito bom, recomendo!', nota: 5 },
     { id: '2', comentario: 'Atendimento excelente', nota: 4 },
   ];
 
+  // useEffect: Carregar barbeiro pelo ID
+  // - Busca os dados do barbeiro pela API
+  // - Atualiza o estado e remove o loading
   useEffect(() => {
     const carregarBarbeiro = async () => {
       if (!barbeiroId) return;
@@ -39,6 +46,7 @@ export default function Barbeiro() {
     carregarBarbeiro();
   }, [barbeiroId]);
 
+  // EXIBIÇÃO DE CARREGAMENTO
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -47,6 +55,7 @@ export default function Barbeiro() {
     );
   }
 
+  // ERRO AO CARREGAR BARBEIRO
   if (!barbeiro) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -55,6 +64,8 @@ export default function Barbeiro() {
     );
   }
 
+  // FUNÇÃO: Abrir conversa no WhatsApp
+  // - Monta mensagem automática com nome do usuário e serviço
   const abrirWhatsApp = (servico: string) => {
     const telefone = (barbeiro as any).telefone || '5521984028545';
     const mensagem = `Olá! Meu nome é *${usuarioLogado.nome} ${usuarioLogado.sobrenome}* Gostaria de agendar um horário para *${servico}* ✂️`;
@@ -65,12 +76,14 @@ export default function Barbeiro() {
     });
   };
 
+  // LISTA DE SERVIÇOS (mock)
   const servicos = [
     { id: '1', nome: 'Corte masculino', preco: 'R$ 29,90' },
     { id: '2', nome: 'Corte feminino', preco: 'R$ 49,90' },
     { id: '3', nome: 'Barba', preco: 'R$ 19,90' },
   ];
 
+  // RENDERIZAÇÃO DO COMPONENTE
   return (
     <View style={styles.container}>
       {/* Header do barbeiro */}

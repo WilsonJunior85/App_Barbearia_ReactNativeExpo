@@ -10,28 +10,36 @@ import EmailIcon from '../../../assets/email.png';
 import LockIcon from '../../../assets/lock.png';
 
 export default function LoginPage() {
+  // CONFIGURAÇÕES E CONTEXTO
   const router = useRouter();
   const { dispatch } = useContext(UserContext);
 
-  //const { setUser } = useContext(UserContext);
+  // ESTADOS LOCAIS
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {}, []);
 
+  // FUNÇÃO: Realizar Login
+  // - Valida campos
+  // - Chama API de autenticação
+  // - Salva token e dados do usuário
+  // - Atualiza contexto global
+  // - Redireciona para tela Home
   const pageLogin = async () => {
     if (!email || !senha) return alert('Preencha todos os campos!');
     setLoading(true);
     try {
+      // Chamada à API de autenticação
       const result = await authService.login(email, senha);
       console.log('Resposta da API:', result);
-
+      // Se sucesso → salva dados e token localmente
       if (result.status && result.data?.token) {
         await AsyncStorage.setItem('@user_token', result.data.token);
         await AsyncStorage.setItem('@usuario', JSON.stringify(result.data));
 
-        // Atualiza contexto global
+        // Atualiza contexto global (UserContext)
         dispatch({
           type: 'setUser',
           payload: {
@@ -41,7 +49,7 @@ export default function LoginPage() {
             avatar: 'https://i.pravatar.cc/100', // avatar genérico
           },
         });
-
+        // Redireciona para a Home
         router.push('/pages/home/home');
         // Alert.alert(`Sempre bom ter você de volta , ${result.data.nome}`);
       } else {
@@ -54,11 +62,14 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  // FUNÇÃO: Ir para tela de cadastro
   const pageCadastrar = () => {
     // Navega para a tela de cadastro
     router.push('/pages/cadastro/cadastro');
   };
 
+  // RENDERIZAÇÃO DO COMPONENTE
   return (
     <View style={styles.container}>
       <Image

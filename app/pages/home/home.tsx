@@ -28,10 +28,12 @@ export default function Home() {
   const router = useRouter();
   const emoji = '✂️';
 
+  // FUNÇÃO: Navegar para o perfil do barbeiro
   const pagePerfil = (usuarioId: number) => {
     router.push(`/pages/Barbeiro/barbeiro?id=${usuarioId}`);
   };
 
+  // FUNÇÃO: Buscar local digitado no input e atualizar mapa
   const buscarLocalDigitado = async () => {
     if (!locationText.trim()) return;
     try {
@@ -46,6 +48,7 @@ export default function Home() {
     }
   };
 
+  //FUNÇÃO: Obter localização atual do usuário
   const obterLocalizacao = async () => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -71,6 +74,10 @@ export default function Home() {
     }
   };
 
+  // useEffect: Carregar dados iniciais
+  // - Lê usuário do AsyncStorage
+  // - Busca lista de barbeiros via API
+  // - Obtém localização atual
   useEffect(() => {
     async function carregarDados() {
       try {
@@ -95,6 +102,7 @@ export default function Home() {
     carregarDados();
   }, []);
 
+  // RENDERIZAÇÃO DO COMPONENTE
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>

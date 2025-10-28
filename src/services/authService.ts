@@ -4,14 +4,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // URL base da API
 const API_URL = "http://192.168.1.78:5295/api";
 
-// Tipos
+// Estrutura esperada para o login (requisição)
 export type LoginRequest = {
     email: string;
     senha: string;
 };
 
+// Estrutura da resposta ao fazer login
 export type LoginResponse = {
-    token: string;
+    token: string; // Token JWT retornado pela API
     data: {
         id: number;
         nome: string;
@@ -20,6 +21,7 @@ export type LoginResponse = {
     };
 };
 
+// Estrutura padrão de um usuário
 export type Usuario = {
     id: number;
     nome: string;
@@ -27,6 +29,7 @@ export type Usuario = {
     email: string;
 };
 
+// Estrutura para criar novo usuário (cadastro)
 export type CreateUsuario = {
     usuario: string;
     nome: string;
@@ -36,7 +39,10 @@ export type CreateUsuario = {
     confirmaSenha: string;
 };
 
-// Função segura para parsear JSON
+
+// Função auxiliar — parse seguro de JSON
+// Garante que, mesmo que o backend não retorne JSON válido
+// (ou retorne vazio), o app não quebre ao tentar parsear.
 async function safeJsonParse(response: Response) {
     try {
         if (!response) return {};
@@ -52,6 +58,10 @@ async function safeJsonParse(response: Response) {
 
 // Serviço de autenticação
 const authService = {
+
+    // LOGIN DO USUÁRIO
+    // Envia email e senha para a rota /Login/Login do backend.
+    // Retorna o token + dados do usuário (se sucesso).
     login: async (email: string, senha: string) => {
         try {
             const response = await fetch(`${API_URL}/Login/Login`, {
@@ -62,6 +72,7 @@ const authService = {
                 },
                 body: JSON.stringify({ email, senha }),
             });
+            // Retorna a resposta convertida em JSON seguro
             return await safeJsonParse(response);
         } catch (err) {
             console.log("Erro signIn:", err);
@@ -69,6 +80,9 @@ const authService = {
         }
     },
 
+    // VERIFICAÇÃO DE TOKEN
+    // Envia o token para a API verificar se ainda é válido.
+    // Pode ser usada ao abrir o app, pra manter o login ativo.
     checkToken: async (token: string) => {
         try {
             const response = await fetch(`${API_URL}/Usuario`, {
@@ -86,6 +100,9 @@ const authService = {
         }
     },
 
+    // CADASTRO DE NOVO USUÁRIO
+    // Envia os dados de registro para /Login/Register.
+    // Usa axios (mais prático para requisições JSON).
     handleCadastro: async (usuario: string, nome: string, sobrenome: string, email: string, senha: string, confirmaSenha: string) => {
         try {
             const response = await axios.post(`${API_URL}/Login/Register`, {
@@ -108,25 +125,32 @@ const authService = {
         }
     },
 
+    // BUSCAR TODOS OS USUÁRIOS
+    // Usa o token salvo no AsyncStorage para autenticação.
+    // Faz GET em /Usuario e retorna a lista de usuários.
     getUsuarios: async (): Promise<Usuario[]> => {
         try {
+            // Recupera o token JWT salvo localmente
             const token = await AsyncStorage.getItem('@user_token');
             if (!token) throw new Error('Token não encontrado no AsyncStorage');
-
+            // Faz a requisição autenticada
             const response = await axios.get(`${API_URL}/Usuario`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
             });
-
-            return response.data.data; //  array de usuários
+            // Retorna o array de usuários vindo da API
+            return response.data.data;
         } catch (err: any) {
             console.error('Erro ao buscar usuários:', err);
             throw err;
         }
     },
 
+    // BUSCAR USUÁRIO PELO ID
+    // Usa o token salvo no AsyncStorage.
+    // Faz GET em /Usuario/{id} e retorna os dados do usuário.
     getUsuarioById: async (id: number): Promise<Usuario> => {
         try {
             const token = await AsyncStorage.getItem('@user_token');
@@ -146,5 +170,5 @@ const authService = {
         }
     },
 };
-
+// Exporta o objeto para uso nos componentes
 export default authService;
