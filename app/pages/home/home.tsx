@@ -1,7 +1,7 @@
 import * as Location from 'expo-location';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, TextInput, Dimensions } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, TextInput, Dimensions, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import BottomMenu from '../../../components/BottomMenu';
@@ -140,7 +140,16 @@ export default function Home() {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.card}>
-            <View style={styles.avatar}></View>
+            <View style={styles.avatar}>
+              <Image
+                source={
+                  (item as any).avatar
+                    ? { uri: (item as any).avatar }
+                    : require('../../../assets/barber.png')
+                }
+                style={styles.avatar}
+              />
+            </View>
             <View style={styles.info}>
               <Text style={styles.nome}>
                 {item.nome} {item.sobrenome}

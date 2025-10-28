@@ -6,6 +6,7 @@ import { UserContext } from '../../../app/contexts/UserContext';
 import authService from '../../../src/services/authService';
 import { styles } from '../../../app/pages/Login/styles';
 import BarberLogo from '../../../assets/barber.png';
+// import BarberLogo from '../../../assets/BarbeariaPrincipal.png';
 import EmailIcon from '../../../assets/email.png';
 import LockIcon from '../../../assets/lock.png';
 

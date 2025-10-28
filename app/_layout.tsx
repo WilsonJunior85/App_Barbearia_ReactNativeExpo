@@ -11,6 +11,10 @@ export default function Layout() {
         <Stack.Screen name="cadastro" />
         <Stack.Screen name="home" />
         <Stack.Screen name="barbeiro" />
+        <Stack.Screen name="Profile" />
+        <Stack.Screen name="Favorites" />
+        <Stack.Screen name="Busca" />
+        <Stack.Screen name="Appointments" />
       </Stack>
     </UserProvider>
   );

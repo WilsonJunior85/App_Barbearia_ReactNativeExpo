@@ -12,6 +12,6 @@ export const styles = StyleSheet.create({
     avaliacao: { flexDirection: 'row', alignItems: 'center', marginBottom: 3 },
     nota: { marginLeft: 5, fontWeight: 'bold', color: '#555' },
     botao: { backgroundColor: '#74C2D4', paddingVertical: 6, paddingHorizontal: 15, borderRadius: 20, alignSelf: 'flex-start', marginLeft: 150, marginTop: -10, width: 100 },
-    textoBotao: { color: '#fff', fontWeight: 'bold' },
+    textoBotao: { color: '#fff', fontWeight: 'bold', marginLeft: 1 },
 
 });

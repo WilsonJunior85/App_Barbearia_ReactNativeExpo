@@ -26,7 +26,7 @@ export default function BottomMenu() {
         elevation: 5,
       }}>
       {/* Ícone Home */}
-      <TouchableOpacity onPress={() => router.push('/pages/Login/login')}>
+      <TouchableOpacity onPress={() => router.push('/pages/home/home')}>
         <Image
           source={require('../assets/home.png')}
           style={{ width: 26, height: 26, tintColor: '#4EADBE' }}
@@ -34,7 +34,7 @@ export default function BottomMenu() {
       </TouchableOpacity>
 
       {/* Ícone Agenda */}
-      <TouchableOpacity onPress={() => router.push('/pages/home/home')}>
+      <TouchableOpacity onPress={() => router.push('/pages/TabBar/Busca/Busca')}>
         <Image
           source={require('../assets/search.png')}
           style={{ width: 26, height: 26, tintColor: '#4EADBE' }}
@@ -55,7 +55,8 @@ export default function BottomMenu() {
           shadowOpacity: 0.2,
           shadowRadius: 4,
           elevation: 8,
-        }}>
+        }}
+        onPress={() => router.push('/pages/TabBar/Appointments/Appointments')}>
         <Image
           source={require('../assets/today.png')}
           style={{ width: 28, height: 28, tintColor: '#fff' }}
@@ -63,7 +64,7 @@ export default function BottomMenu() {
       </TouchableOpacity>
 
       {/* Ícone Favoritos */}
-      <TouchableOpacity onPress={() => router.push('/pages/home/home')}>
+      <TouchableOpacity onPress={() => router.push('/pages/TabBar/Favorites/Favorites')}>
         <Image
           source={require('../assets/favorite_full.png')}
           style={{ width: 26, height: 26, tintColor: '#4EADBE' }}
@@ -71,7 +72,7 @@ export default function BottomMenu() {
       </TouchableOpacity>
 
       {/* Ícone Perfil */}
-      <TouchableOpacity onPress={() => router.push('/pages/home/home')}>
+      <TouchableOpacity onPress={() => router.push('/pages/TabBar/Profile/Profile')}>
         <Image
           source={require('../assets/account.png')}
           style={{ width: 26, height: 26, tintColor: '#4EADBE' }}
