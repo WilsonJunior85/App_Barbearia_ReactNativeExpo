@@ -1,4 +1,8 @@
-import { StyleSheet } from "react-native";
+
+import { StyleSheet, Dimensions } from "react-native";
+
+const { width } = Dimensions.get('window');
+const IMAGE_HEIGHT = 250;
 
 export const styles = StyleSheet.create({
     container: {
@@ -6,33 +10,39 @@ export const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
 
-    // TOPO AZUL ARREDONDADO
-    Topo: {
-        backgroundColor: '#4EADBE',
-        height: 290,
-        borderBottomLeftRadius: 15,
-        borderBottomRightRadius: 15,
-        paddingTop: 50,
-        paddingHorizontal: 20,
-        shadowColor: '#000',
-        shadowOpacity: 0.15,
-        shadowRadius: 2,
-        shadowOffset: { width: 0, height: 4 },
-        elevation: 6,
-
+    /** TOPO COM IMAGEM E ANIMAÇÃO **/
+    topoContainer: {
+        height: IMAGE_HEIGHT,
+        width,
     },
 
-    // Linha da seta no canto superior
-    Setas: {
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
+    imagemTopo: {
+        width,
+        height: IMAGE_HEIGHT,
+        position: 'absolute',
     },
 
-    // Avatar e informações do barbeiro
+    overlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.3)',
+    },
+
+    botaoVoltar: {
+        position: 'absolute',
+        top: 40,
+        left: 20,
+        zIndex: 2,
+    },
+
     header: {
+        position: 'absolute',
+        bottom: 20,
+        alignSelf: 'center',
         alignItems: 'center',
-        marginTop: 10,
     },
 
     avatar: {
@@ -44,31 +54,35 @@ export const styles = StyleSheet.create({
         backgroundColor: '#ccc',
     },
 
-    infoHeader: {
-        alignItems: 'center',
-        marginTop: 10,
-    },
-
     nome: {
         color: '#fff',
         fontSize: 20,
         fontWeight: 'bold',
-        marginTop: 6,
+        marginTop: 8,
     },
 
     avaliacao: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 8,
+        marginTop: 5,
+    },
+
+    estrela: {
+        marginHorizontal: 2,
     },
 
     nota: {
         marginLeft: 6,
-        fontSize: 14,
+        fontSize: 16,
         color: '#fff',
     },
 
-    // Títulos de seções
+    /** CONTEÚDO GERAL **/
+    conteudo: {
+        padding: 20,
+    },
+
+    /** Títulos das seções **/
     tituloLista: {
         fontSize: 16,
         fontWeight: 'bold',
@@ -77,7 +91,7 @@ export const styles = StyleSheet.create({
         color: '#333',
     },
 
-    // Serviços
+    /** Lista de serviços **/
     servicoContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -112,7 +126,7 @@ export const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
 
-    // Avaliações
+    /** Avaliações **/
     avaliacaoContainer: {
         backgroundColor: '#f0f4f8',
         padding: 12,
