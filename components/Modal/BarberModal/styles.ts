@@ -59,4 +59,17 @@ export const styles = StyleSheet.create({
         marginTop: 10,
         fontWeight: '600',
     },
+    avatar: {
+        width: 90,
+        height: 90,
+        borderRadius: 45,
+        marginBottom: 10,
+    },
+
+    nome: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+        textAlign: 'center',
+    },
 });

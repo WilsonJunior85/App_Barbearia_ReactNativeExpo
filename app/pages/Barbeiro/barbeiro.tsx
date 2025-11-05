@@ -1,64 +1,33 @@
-// Importações principais do React e React Native
-import React, { useEffect, useState, useContext, useRef } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  Dimensions,
-  Linking,
-  ScrollView,
-  Animated,
-  Modal,
-} from 'react-native';
-
-// Ícones do pacote Expo (usados para estrelas e botão voltar)
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, Image, TouchableOpacity, ScrollView, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
-// Importa o arquivo de estilos centralizado
 import { styles } from './styles';
-
-// Importa utilitários do Expo Router (para navegação)
 import { useLocalSearchParams, useRouter } from 'expo-router';
-
-// Serviço de autenticação e model do usuário
 import authService, { Usuario } from '../../../src/services/authService';
-
-// Contexto global do usuário logado
-import { UserContext } from '../../../app/contexts/UserContext';
-
-// Componente reutilizável que exibe uma avaliação individual
+// import { UserContext } from '../../../app/contexts/UserContext';
 import { Avaliacao } from '../Avaliacao/avaliacao';
+import BarberModal from '../../../components/Modal/BarberModal/BarberModal';
 
-// Constantes globais de layout e animação
-const { width } = Dimensions.get('window'); // Largura da tela
-const IMAGE_HEIGHT = 250; // Altura fixa do banner superior
-const FADE_DURATION = 1000; // Tempo do fade in/out (1s)
-const INTERVAL = 4000; // Tempo de troca entre imagens (4s)
+// const { width } = Dimensions.get('window');
+// const IMAGE_HEIGHT = 250;
+const FADE_DURATION = 1000;
+const INTERVAL = 4000;
 
 export default function Barbeiro() {
-  // Hook para navegação entre telas
   const router = useRouter();
-
-  // Obtém parâmetros da URL (ex: id do barbeiro)
   const params = useLocalSearchParams();
   const barbeiroId = params.id ? Number(params.id) : null;
 
-  // Pega o usuário logado do contexto global
-  const { state: usuarioLogado } = useContext(UserContext);
+  // const { state: usuarioLogado } = useContext(UserContext);
 
-  // Estados locais do componente
-  const [barbeiro, setBarbeiro] = useState<Usuario | null>(null); // Dados do barbeiro
-  const [notaSelecionada, setNotaSelecionada] = useState(0); // Estrelas clicadas
-  const [currentIndex, setCurrentIndex] = useState(0); // Índice atual da imagem no slider
+  const [barbeiro, setBarbeiro] = useState<Usuario | null>(null);
+  const [notaSelecionada, setNotaSelecionada] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [mostrarModal, setMostrarModal] = useState(false); // controla modal
+  const [servicoSelecionado, setServicoSelecionado] = useState<string | null>(null);
 
-  // const [agendarServico, setAgendarServico] = useState(null);
-  // const [showModal, setShowModal] = useState(false); // Vai controlar a exibição do modal
-
-  // Valor animado para o efeito de fade entre imagens
   const opacity = useRef(new Animated.Value(1)).current;
 
-  // Imagens do topo (banner que alterna automaticamente)
   const imagensTopo = [
     require('../../../assets/corte1.png'),
     require('../../../assets/corte2.png'),
@@ -66,29 +35,24 @@ export default function Barbeiro() {
     require('../../../assets/corte4.png'),
   ];
 
-  // Avaliações de exemplo (mockadas)
   const avaliacoesMockadas = [
     { id: '1', comentario: 'Muito bom, recomendo!', nota: 5 },
     { id: '2', comentario: 'Atendimento excelente', nota: 4 },
   ];
 
-  // Lista fixa de serviços oferecidos
   const servicos = [
     { id: '1', nome: 'Corte masculino', preco: 'R$ 29,90' },
     { id: '2', nome: 'Corte feminino', preco: 'R$ 49,90' },
     { id: '3', nome: 'Barba', preco: 'R$ 19,90' },
   ];
 
-  /**
-   * useEffect para carregar os dados do barbeiro ao abrir a tela.
-   * Usa o ID vindo por parâmetro e faz a chamada à API.
-   */
+  // 🔹 Carrega os dados do barbeiro real
   useEffect(() => {
     const carregarBarbeiro = async () => {
       if (!barbeiroId) return;
       try {
         const barbeiroApi = await authService.getUsuarioById(barbeiroId);
-        setBarbeiro(barbeiroApi); // Salva o barbeiro no estado
+        setBarbeiro(barbeiroApi);
       } catch (err) {
         console.error('Erro ao carregar barbeiro:', err);
       }
@@ -96,22 +60,15 @@ export default function Barbeiro() {
     carregarBarbeiro();
   }, [barbeiroId]);
 
-  /**
-   * useEffect responsável pelo slide automático de imagens.
-   * Faz o fade out/in entre as imagens a cada INTERVAL milissegundos.
-   */
+  // 🔹 Efeito de troca automática das imagens do topo
   useEffect(() => {
     const timer = setInterval(() => {
-      // Inicia fade out
       Animated.timing(opacity, {
         toValue: 0,
         duration: FADE_DURATION,
         useNativeDriver: true,
       }).start(() => {
-        // Troca a imagem quando o fade termina
         setCurrentIndex((prev) => (prev + 1) % imagensTopo.length);
-
-        // Inicia o fade in
         Animated.timing(opacity, {
           toValue: 1,
           duration: FADE_DURATION,
@@ -119,51 +76,30 @@ export default function Barbeiro() {
         }).start();
       });
     }, INTERVAL);
-
-    // Limpa o timer ao desmontar o componente
     return () => clearInterval(timer);
   });
 
-  /**
-   * Função que abre o WhatsApp com mensagem pré-formatada
-   * contendo o nome do usuário e o serviço escolhido.
-   */
-  const abrirWhatsApp = (servico: string) => {
-    const telefone = (barbeiro as any)?.telefone || '5521984028545'; // fallback padrão
-    const mensagem = `Olá! Meu nome é *${usuarioLogado.nome} ${usuarioLogado.sobrenome}* Gostaria de agendar um horário para *${servico}* ✂️`;
-    const url = `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`;
-    Linking.openURL(url).catch(() => alert('Não foi possível abrir o WhatsApp.'));
-  };
-
-  // Enquanto os dados do barbeiro não carregam, mostra mensagem simples
   if (!barbeiro) return <Text>Carregando barbeiro...</Text>;
 
-  /**
-   * Renderização principal da tela
-   * (ScrollView para permitir rolagem do conteúdo)
-   */
   return (
     <ScrollView style={styles.container}>
-      {/* TOPO - Slider de imagens com efeito de fade */}
+      {/* TOPO - Slider de imagens */}
       <View style={styles.topoContainer}>
-        {/* Imagem animada com fade */}
         <Animated.Image
           source={imagensTopo[currentIndex]}
           style={[styles.imagemTopo, { opacity }]}
           resizeMode="cover"
         />
-
-        {/* Overlay escuro para contraste do texto */}
         <View style={styles.overlay} />
 
-        {/* Botão voltar para a tela anterior */}
+        {/* Botão voltar */}
         <View style={styles.botaoVoltar}>
           <TouchableOpacity onPress={() => router.push('/pages/home/home')}>
             <Ionicons name="arrow-back" size={28} color="#fff" />
           </TouchableOpacity>
         </View>
 
-        {/* Cabeçalho: avatar, nome e estrelas */}
+        {/* Cabeçalho com nome e estrelas */}
         <View style={styles.header}>
           <Image
             source={
@@ -177,7 +113,6 @@ export default function Barbeiro() {
             {barbeiro.nome} {barbeiro.sobrenome}
           </Text>
 
-          {/* Estrelas de avaliação clicáveis */}
           <View style={styles.avaliacao}>
             {Array.from({ length: 5 }).map((_, i) => (
               <TouchableOpacity key={i} onPress={() => setNotaSelecionada(i + 1)}>
@@ -194,40 +129,44 @@ export default function Barbeiro() {
         </View>
       </View>
 
-      {/* CONTEÚDO INFERIOR */}
+      {/* CONTEÚDO */}
       <View style={styles.conteudo}>
-        {/* Seção de serviços */}
         <Text style={styles.tituloLista}>Lista de serviços</Text>
 
-        {servicos.map((item, key) => (
+        {servicos.map((item) => (
           <View key={item.id} style={styles.servicoContainer}>
             <View>
               <Text style={styles.servicoNome}>{item.nome}</Text>
               <Text style={styles.servicoPreco}>{item.preco}</Text>
             </View>
-            {/* Botão de agendamento via WhatsApp */}
-            {/* <TouchableOpacity style={styles.botaoAgendar} onPress={() => abrirWhatsApp(item.nome)}> */}
+
+            {/* ✅ Abre a modal passando nome e avatar do barbeiro */}
             <TouchableOpacity
               style={styles.botaoAgendar}
-              onPress={() =>
-                router.push({
-                  pathname: '/pages/Modal/BarberModal/BarberModal',
-                  params: { servico: item.nome },
-                })
-              }>
+              onPress={() => {
+                setServicoSelecionado(item.nome);
+                setMostrarModal(true);
+              }}>
               <Text style={styles.textoBotao}>Agendar</Text>
             </TouchableOpacity>
           </View>
         ))}
 
-        {/* Seção de avaliações */}
         <Text style={styles.tituloLista}>Avaliações</Text>
-
-        {/* Renderiza avaliações mockadas usando o componente Avaliacao */}
         {avaliacoesMockadas.map((item) => (
           <Avaliacao key={item.id} comentario={item.comentario} notaInicial={item.nota} />
         ))}
       </View>
+
+      {/* ✅ Modal com dados reais do barbeiro */}
+      {mostrarModal && (
+        <BarberModal
+          servico={servicoSelecionado || undefined}
+          barbeiroNome={`${barbeiro.nome} ${barbeiro.sobrenome}`}
+          barbeiroAvatar={(barbeiro as any)?.avatar || null}
+          onClose={() => setMostrarModal(false)}
+        />
+      )}
     </ScrollView>
   );
 }
