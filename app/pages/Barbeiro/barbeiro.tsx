@@ -9,6 +9,7 @@ import {
   Linking,
   ScrollView,
   Animated,
+  Modal,
 } from 'react-native';
 
 // Ícones do pacote Expo (usados para estrelas e botão voltar)
@@ -50,6 +51,9 @@ export default function Barbeiro() {
   const [barbeiro, setBarbeiro] = useState<Usuario | null>(null); // Dados do barbeiro
   const [notaSelecionada, setNotaSelecionada] = useState(0); // Estrelas clicadas
   const [currentIndex, setCurrentIndex] = useState(0); // Índice atual da imagem no slider
+
+  // const [agendarServico, setAgendarServico] = useState(null);
+  // const [showModal, setShowModal] = useState(false); // Vai controlar a exibição do modal
 
   // Valor animado para o efeito de fade entre imagens
   const opacity = useRef(new Animated.Value(1)).current;
@@ -118,7 +122,7 @@ export default function Barbeiro() {
 
     // Limpa o timer ao desmontar o componente
     return () => clearInterval(timer);
-  }, []);
+  });
 
   /**
    * Função que abre o WhatsApp com mensagem pré-formatada
@@ -195,14 +199,22 @@ export default function Barbeiro() {
         {/* Seção de serviços */}
         <Text style={styles.tituloLista}>Lista de serviços</Text>
 
-        {servicos.map((item) => (
+        {servicos.map((item, key) => (
           <View key={item.id} style={styles.servicoContainer}>
             <View>
               <Text style={styles.servicoNome}>{item.nome}</Text>
               <Text style={styles.servicoPreco}>{item.preco}</Text>
             </View>
             {/* Botão de agendamento via WhatsApp */}
-            <TouchableOpacity style={styles.botaoAgendar} onPress={() => abrirWhatsApp(item.nome)}>
+            {/* <TouchableOpacity style={styles.botaoAgendar} onPress={() => abrirWhatsApp(item.nome)}> */}
+            <TouchableOpacity
+              style={styles.botaoAgendar}
+              onPress={() =>
+                router.push({
+                  pathname: '/pages/Modal/BarberModal/BarberModal',
+                  params: { servico: item.nome },
+                })
+              }>
               <Text style={styles.textoBotao}>Agendar</Text>
             </TouchableOpacity>
           </View>

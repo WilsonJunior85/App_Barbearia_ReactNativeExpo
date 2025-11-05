@@ -15,6 +15,7 @@ export default function Layout() {
         <Stack.Screen name="Favorites" />
         <Stack.Screen name="Busca" />
         <Stack.Screen name="Appointments" />
+        <Stack.Screen name="BarberModal" />
       </Stack>
     </UserProvider>
   );
