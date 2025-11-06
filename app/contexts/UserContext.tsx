@@ -7,6 +7,8 @@ export type UserState = {
   sobrenome?: string;
   email?: string;
   avatar: string;
+  telefone?: string;
+  sexo?: string;
   favorites: string[];
   appointments: string[];
 };
@@ -15,7 +17,8 @@ export type UserState = {
 export type UserAction =
   | { type: 'setAvatar'; payload: { avatar: string } }
   | { type: 'addFavorite'; payload: { favorite: string } }
-  | { type: 'setUser'; payload: Partial<UserState> }; // adicionamos "setUser" para atualizar vários campos
+  | { type: 'setUser'; payload: Partial<UserState> }
+  | { type: 'logout' }; // adiciona o logout aqui também
 
 // Estado inicial padrão
 export const initialState: UserState = {
@@ -33,18 +36,20 @@ export const UserReducer = (state: UserState, action: UserAction): UserState => 
       return { ...state, favorites: [...state.favorites, action.payload.favorite] };
     case 'setUser':
       return { ...state, ...action.payload };
+    case 'logout': // limpa o estado do usuário
+      return initialState;
     default:
       return state;
   }
 };
 
-//  Tipo do contexto
+// Tipo do contexto
 export type UserContextType = {
   state: UserState;
   dispatch: Dispatch<UserAction>;
 };
 
-//  Criação do contexto (com tipo forçado para evitar erro)
+// Criação do contexto
 export const UserContext = createContext<UserContextType>({} as UserContextType);
 
 // Provider que vai envolver o app

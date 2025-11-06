@@ -4,43 +4,42 @@ export type UserState = {
     nome?: string;
     sobrenome?: string;
     email?: string;
+    telefone?: string;   // adiciona telefone aqui
+    sexo?: string;       // adiciona sexo aqui
     avatar: string;
     favorites: string[];
     appointments: string[];
 };
 
 // Tipos de ações (UserAction)
-// Cada ação representa uma possível mudança no estado do usuário.
-// O 'type' define o tipo da ação, e o 'payload' traz os dados necessários.
 export type UserAction =
     | { type: 'setAvatar'; payload: { avatar: string } }
     | { type: 'addFavorite'; payload: { favorite: string } }
-    | { type: 'setUser'; payload: Partial<UserState> }; // Atualiza múltiplos campos de uma vez
+    | { type: 'setUser'; payload: Partial<UserState> }
+    | { type: 'logout' }; // adiciona a ação de logout
 
-// Estado inicial do usuário (usado no useReducer)
+// Estado inicial do usuário
 export const initialState: UserState = {
-    avatar: '',          // Começa sem avatar
-    favorites: [],       // Nenhum favorito inicialmente
-    appointments: [],    // Nenhum agendamento inicialmente
+    avatar: '',
+    favorites: [],
+    appointments: [],
 };
 
-// Reducer: função pura que altera o estado com base na ação recebida
-// É usada dentro do hook useReducer() no contexto de usuário.
-// Recebe o estado atual (state) e uma ação (action),
-// e retorna um novo estado atualizado.
+// Reducer: altera o estado com base na ação
 export const UserReducer = (state: UserState, action: UserAction): UserState => {
     switch (action.type) {
-        // Atualiza apenas o avatar do usuário
         case 'setAvatar':
             return { ...state, avatar: action.payload.avatar };
-        // Adiciona um novo item à lista de favoritos
+
         case 'addFavorite':
             return { ...state, favorites: [...state.favorites, action.payload.favorite] };
-        // Atualiza múltiplos campos do usuário de uma vez
-        // (por exemplo: nome, email, avatar, etc.)
+
         case 'setUser':
-            return { ...state, ...action.payload }; // Atualiza o usuário (nome, email, avatar etc.)
-        // Caso nenhuma ação corresponda, retorna o estado atual sem alteração
+            return { ...state, ...action.payload };
+
+        case 'logout':
+            return initialState; // limpa o estado do usuário ao deslogar
+
         default:
             return state;
     }

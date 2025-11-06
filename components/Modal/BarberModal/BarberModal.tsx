@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { View, Text, TouchableOpacity, Platform, Modal, Linking, Image } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
-import { styles } from './styles';
+import { styles } from '../BarberModal/styles';
 import { UserContext } from '../../../app/contexts/UserContext';
 
 interface BarberModalProps {
